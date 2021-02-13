@@ -18,14 +18,14 @@ func SearchMany(ctx *context.Context, conn *ent.Client) echo.HandlerFunc {
 		}
 		keyword := c.Param("search")
 
-		productBuilder := conn.Product.Query().Order(
+		products, err := conn.Product.Query().Where(product.NameContains(keyword)).Order(
 			ent.Desc(product.FieldExpiredAt),
-		).Where(product.NameContains(keyword))
-		products, err := productBuilder.Offset((page - 1) * perPage).Limit(perPage).All(*ctx)
+		).Offset((page - 1) * perPage).Limit(perPage).All(*ctx)
+
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Server ERROR")
 		}
-		counted, err := productBuilder.Count(*ctx)
+		counted, err := conn.Product.Query().Where(product.NameContains(keyword)).Count(*ctx)
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Bad Request")
 		}
