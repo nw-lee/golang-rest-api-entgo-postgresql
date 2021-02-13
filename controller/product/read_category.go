@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/quavious/golang-docker-forum/ent"
 	"github.com/quavious/golang-docker-forum/ent/category"
+	"github.com/quavious/golang-docker-forum/ent/product"
 )
 
 func ReadCategory(ctx *context.Context, conn *ent.Client) echo.HandlerFunc {
@@ -27,7 +28,9 @@ func ReadCategory(ctx *context.Context, conn *ent.Client) echo.HandlerFunc {
 				cq.Where(category.IDEQ(keyword)).Only(*ctx)
 			},
 		)
-		products, err := productBuilder.Offset((page - 1) * perPage).Limit(perPage).All(*ctx)
+		products, err := productBuilder.Order(
+			ent.Desc(product.FieldExpiredAt),
+		).Offset((page - 1) * perPage).Limit(perPage).All(*ctx)
 
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Server ERROR")

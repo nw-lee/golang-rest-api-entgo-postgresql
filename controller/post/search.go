@@ -17,7 +17,9 @@ func SearchMany(ctx *context.Context, conn *ent.Client) echo.HandlerFunc {
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Bad Request")
 		}
-		posts, err := conn.Post.Query().Where(post.TitleContains(param)).Offset((id - 1) * perPage).Limit(perPage).All(*ctx)
+		posts, err := conn.Post.Query().Order(
+			ent.Desc(post.FieldCreatedAt),
+		).Where(post.TitleContains(param)).Offset((id - 1) * perPage).Limit(perPage).All(*ctx)
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Bad Request")
 		}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/quavious/golang-docker-forum/ent"
+	"github.com/quavious/golang-docker-forum/ent/product"
 )
 
 func ReadMany(ctx *context.Context, conn *ent.Client) echo.HandlerFunc {
@@ -16,7 +17,9 @@ func ReadMany(ctx *context.Context, conn *ent.Client) echo.HandlerFunc {
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Bad Request")
 		}
-		products, err := conn.Product.Query().Offset((page - 1) * perPage).Limit(perPage).All(*ctx)
+		products, err := conn.Product.Query().Order(
+			ent.Desc(product.FieldExpiredAt),
+		).Offset((page - 1) * perPage).Limit(perPage).All(*ctx)
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Server ERROR")
 		}

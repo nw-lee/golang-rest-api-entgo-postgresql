@@ -18,7 +18,9 @@ func SearchMany(ctx *context.Context, conn *ent.Client) echo.HandlerFunc {
 		}
 		keyword := c.Param("search")
 
-		productBuilder := conn.Product.Query().Where(product.NameContains(keyword))
+		productBuilder := conn.Product.Query().Order(
+			ent.Desc(product.FieldExpiredAt),
+		).Where(product.NameContains(keyword))
 		products, err := productBuilder.Offset((page - 1) * perPage).Limit(perPage).All(*ctx)
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Server ERROR")
