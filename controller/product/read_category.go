@@ -22,22 +22,18 @@ func ReadCategory(ctx *context.Context, conn *ent.Client) echo.HandlerFunc {
 			return c.String(http.StatusBadRequest, "Bad Request")
 		}
 
-		products, err := conn.Product.Query().WithBelongs(
-			func(cq *ent.CategoryQuery) {
-				cq.Where(category.IDEQ(keyword)).Only(*ctx)
-			},
-		).Order(
+		products, err := conn.Category.Query().Where(
+			category.IDEQ(keyword),
+		).QueryContains().Order(
 			ent.Desc(product.FieldExpiredAt),
 		).Offset((page - 1) * perPage).Limit(perPage).All(*ctx)
 
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Server ERROR")
 		}
-		counted, err := conn.Product.Query().WithBelongs(
-			func(cq *ent.CategoryQuery) {
-				cq.Where(category.IDEQ(keyword)).Only(*ctx)
-			},
-		).Count(*ctx)
+		counted, err := conn.Category.Query().Where(
+			category.IDEQ(keyword),
+		).QueryContains().Count(*ctx)
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Bad Request")
 		}
