@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
+	"github.com/quavious/golang-docker-forum/controller/category"
 	"github.com/quavious/golang-docker-forum/controller/comment"
 	"github.com/quavious/golang-docker-forum/controller/post"
 	"github.com/quavious/golang-docker-forum/controller/product"
@@ -52,9 +53,11 @@ func main() {
 	app.GET("/product/category/:category/:id", product.ReadCategory(&ctx, conn))
 	app.GET("/product/search/:search/:id", product.SearchMany(&ctx, conn))
 
+	app.GET("/product/category/menu", category.CategoryMenu(&ctx, conn))
+
 	app.GET("/check", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Check Route")
 	})
 
-	app.Logger.Fatal(app.Start("0.0.0.0:5000"))
+	app.Logger.Fatal(app.Start("localhost:5000"))
 }
