@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/quavious/golang-docker-forum/ent"
@@ -24,14 +23,6 @@ func ReadMany(ctx *context.Context, conn *ent.Client) echo.HandlerFunc {
 			return c.String(http.StatusBadRequest, "Server ERROR")
 		}
 
-		filter := time.Now()
-		var filtered []*ent.Product
-
-		for _, product := range products {
-			if filter.Before(product.ExpiredAt) {
-				filtered = append(filtered, product)
-			}
-		}
 		counted, err := conn.Product.Query().Count(*ctx)
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Bad Request")
@@ -39,7 +30,7 @@ func ReadMany(ctx *context.Context, conn *ent.Client) echo.HandlerFunc {
 		maxPage := (counted / perPage) + 1
 		return c.JSON(http.StatusOK, echo.Map{
 			"status":      true,
-			"products":    filtered,
+			"products":    products,
 			"maxPage":     maxPage,
 			"currentPage": page,
 		})
